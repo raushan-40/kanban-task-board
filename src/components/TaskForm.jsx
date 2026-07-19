@@ -3,7 +3,6 @@ import { useState } from 'react';
 function TaskForm({ onAddTask }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  // Local state initialized to medium priority
   const [priority, setPriority] = useState('medium');
 
   const handleSubmit = (e) => {
@@ -14,78 +13,51 @@ function TaskForm({ onAddTask }) {
     onAddTask({
       title: title.trim(),
       description: description.trim(),
-      priority, // Pass priority up to the parent
+      priority,
     });
 
     setTitle('');
     setDescription('');
-    setPriority('medium'); // Reset dropdown back to default medium
-  };
-
-  const formStyle = {
-    backgroundColor: '#ffffff',
-    borderRadius: '8px',
-    padding: '1.5rem',
-    maxWidth: '500px',
-    margin: '0 auto 2rem auto',
-    boxShadow: '0 1px 3px rgba(9, 30, 66, 0.25)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  };
-
-  const inputStyle = {
-    padding: '0.6rem',
-    borderRadius: '4px',
-    border: '1px solid #dfe1e6',
-    fontSize: '0.9rem',
-    fontFamily: 'sans-serif',
-  };
-
-  const selectStyle = {
-    ...inputStyle,
-    cursor: 'pointer',
-    backgroundColor: '#fafbfc',
-  };
-
-  const buttonStyle = {
-    backgroundColor: '#0052cc',
-    color: '#ffffff',
-    padding: '0.6rem',
-    borderRadius: '4px',
-    border: 'none',
-    fontWeight: '600',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
+    setPriority('medium');
   };
 
   return (
-    <form onSubmit={handleSubmit} style={formStyle}>
-      <h3 style={{ margin: 0, color: '#172b4d' }}>Create a New Task</h3>
+    // Replaced inline styling blocks with clean layout-specific classes
+    <form onSubmit={handleSubmit} className="form-card">
+      <h3>Create a New Task</h3>
       
-      <input
-        type="text"
-        placeholder="Task Title (required)"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        style={inputStyle}
-      />
+      <div className="input-group">
+        <label htmlFor="title-field">Task Title (required)</label>
+        <input
+          id="title-field"
+          type="text"
+          placeholder="Enter task name..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="form-input"
+        />
+      </div>
       
-      <textarea
-        placeholder="Task Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }}
-      />
+      <div className="input-group">
+        <label htmlFor="desc-field">Task Description</label>
+        <textarea
+          id="desc-field"
+          placeholder="Enter description..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="form-input"
+          style={{ minHeight: '60px', resize: 'vertical' }} // Kept native box height inline
+        />
+      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-        <label style={{ fontSize: '0.8rem', color: '#5e6c84', fontWeight: '600' }}>
-          Select Priority Level:
-        </label>
+      <div className="input-group">
+        <label htmlFor="prio-select">Select Priority Level:</label>
         <select 
+          id="prio-select"
           value={priority} 
           onChange={(e) => setPriority(e.target.value)} 
-          style={selectStyle}
+          className="form-input"
+          style={{ cursor: 'pointer' }}
         >
           <option value="low">Low Priority</option>
           <option value="medium">Medium Priority</option>
@@ -93,7 +65,7 @@ function TaskForm({ onAddTask }) {
         </select>
       </div>
       
-      <button type="submit" style={buttonStyle}>
+      <button type="submit" className="btn btn-primary">
         Add Task
       </button>
     </form>

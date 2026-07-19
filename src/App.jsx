@@ -40,8 +40,6 @@ function App() {
   });
 
   const [editingTaskId, setEditingTaskId] = useState(null);
-  
-  // New state to track the active search string
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -98,9 +96,6 @@ function App() {
     setEditingTaskId(null);
   };
 
-  // --- DERIVED DATA CALCULATION ---
-  // We calculate filteredTasks on every render. If searchQuery is empty,
-  // includes('') returns true, showing all tasks.
   const filteredTasks = tasks.filter((task) => {
     const normalizedQuery = searchQuery.toLowerCase().trim();
     const matchesTitle = task.title.toLowerCase().includes(normalizedQuery);
@@ -109,71 +104,38 @@ function App() {
     return matchesTitle || matchesDescription;
   });
 
-  const containerStyle = {
-    fontFamily: 'sans-serif',
-    backgroundColor: '#fafbfc',
-    minHeight: '100vh',
-    padding: '1rem',
-  };
-
-  const headerStyle = {
-    textAlign: 'center',
-    color: '#091e42',
-    marginBottom: '2rem',
-  };
-
-  const searchContainerStyle = {
-    maxWidth: '500px',
-    margin: '0 auto 1.5rem auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.3rem',
-  };
-
-  const searchInputStyle = {
-    padding: '0.6rem',
-    borderRadius: '4px',
-    border: '1px solid #dfe1e6',
-    fontSize: '0.9rem',
-    fontFamily: 'sans-serif',
-    boxSizing: 'border-box',
-    width: '100%',
-  };
-
   return (
-    <div style={containerStyle}>
-      <header style={headerStyle}>
+    // Replaced inline styling wrappers with custom semantic CSS classes
+    <div className="app-container">
+      <header className="app-header">
         <h1>Kanban Board</h1>
       </header>
       
-      <main>
+      <main className="controls-wrapper">
         <TaskForm onAddTask={handleAddTask} />
         
-        {/* Search Input Controls */}
-        <div style={searchContainerStyle}>
-          <label style={{ fontSize: '0.8rem', color: '#5e6c84', fontWeight: '600' }}>
-            Search Tasks:
-          </label>
+        <div className="input-group">
+          <label htmlFor="search-field">Search Tasks:</label>
           <input 
+            id="search-field"
             type="text"
             placeholder="Type task title or description to search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={searchInputStyle}
+            className="form-input"
           />
         </div>
-
-        {/* Passing the computed filteredTasks instead of the raw tasks state */}
-        <Board 
-          tasks={filteredTasks} 
-          onDeleteTask={handleDeleteTask} 
-          onMoveTask={handleMoveTask} 
-          editingTaskId={editingTaskId}
-          onStartEdit={handleStartEdit}
-          onCancelEdit={handleCancelEdit}
-          onSaveTask={handleSaveTask}
-        />
       </main>
+
+      <Board 
+        tasks={filteredTasks} 
+        onDeleteTask={handleDeleteTask} 
+        onMoveTask={handleMoveTask} 
+        editingTaskId={editingTaskId}
+        onStartEdit={handleStartEdit}
+        onCancelEdit={handleCancelEdit}
+        onSaveTask={handleSaveTask}
+      />
     </div>
   );
 }

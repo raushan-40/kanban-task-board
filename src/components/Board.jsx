@@ -1,4 +1,3 @@
-// Imported dnd-kit context hooks and sensors
 import { 
   DndContext, 
   useSensor, 
@@ -16,33 +15,20 @@ function Board({
   onCancelEdit, 
   onSaveTask 
 }) {
-  const boardStyle = {
-    display: 'flex',
-    gap: '1.5rem',
-    padding: '1.5rem',
-    overflowX: 'auto',
-    alignItems: 'flex-start',
-  };
-
-  // 1. Configure sensors with a click/drag distance buffer to keep buttons functional
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Drag is triggered only if pointer moves 8px. Clicks operate normally.
+        distance: 8,
       },
     })
   );
 
-  // 2. Handle drop complete event
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
-    // Guard: Verify if the card was dropped over a valid drop target
     if (over && active.id && over.id) {
       const taskId = active.id;
-      const newStatus = over.id; // Corresponds to target Column status
-
-      // Update task position in state
+      const newStatus = over.id;
       onMoveTask(taskId, newStatus);
     }
   };
@@ -52,10 +38,9 @@ function Board({
   const doneTasks = tasks.filter((task) => task.status === 'done');
 
   return (
-    // Wrap columns with DndContext
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div style={boardStyle}>
-        {/* Added status prop to map as droppable identifiers */}
+      {/* Replaced inline styles with board-grid class */}
+      <div className="board-grid">
         <Column 
           status="todo"
           title="To Do" 

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-// Imported useDraggable hook
 import { useDraggable } from '@dnd-kit/core';
 
 function TaskCard({ 
@@ -13,8 +12,6 @@ function TaskCard({
 }) {
   const [draftTitle, setDraftTitle] = useState(task.title);
 
-  // 1. Initialize TaskCard as a draggable component mapping its ID to task.id
-  // Disable drag listeners if inline editing is active to avoid conflict while selecting text
   const { 
     attributes, 
     listeners, 
@@ -45,141 +42,43 @@ function TaskCard({
     onCancelEdit();
   };
 
-  const getPriorityBorderColor = (priority) => {
-    switch (priority) {
-      case 'high':
-        return '#de350b';
-      case 'medium':
-        return '#ffab00';
-      case 'low':
-        return '#36b37e';
-      default:
-        return '#dfe1e6';
-    }
-  };
-
-  const cardStyle = {
-    backgroundColor: '#ffffff',
-    borderRadius: '6px',
-    padding: '1rem',
-    boxShadow: '0 1px 3px rgba(9, 30, 66, 0.25)',
-    borderBottom: '1px solid #ddd',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-    borderLeft: `5px solid ${getPriorityBorderColor(task.priority)}`,
-    cursor: isEditing ? 'default' : 'grab',
-    touchAction: 'none', // Prevents default touch scroll behavior while dragging on mobile devices
-    
-    // 2. Map position offset dynamically when the card is active
+  // We isolate dnd-kit dynamic layout parameters inside this inline object 
+  const dndStyle = {
     transform: transform 
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)` 
       : undefined,
     zIndex: isDragging ? 999 : undefined,
-    opacity: isDragging ? 0.7 : undefined,
-    transition: transform ? undefined : 'transform 0.1s ease', // Smooth snap-back transition
-  };
-
-  const titleStyle = {
-    margin: 0,
-    color: '#172b4d',
-    fontSize: '1rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    padding: '0.2rem 0',
-  };
-
-  const descriptionStyle = {
-    margin: 0,
-    color: '#5e6c84',
-    fontSize: '0.85rem',
-    lineHeight: '1.4',
-  };
-
-  const actionsContainerStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: '0.5rem',
-    gap: '0.5rem',
-  };
-
-  const editInputStyle = {
-    width: '100%',
-    padding: '0.4rem',
-    borderRadius: '4px',
-    border: '2px solid #4c9aff',
-    fontSize: '1rem',
-    fontWeight: '600',
-    fontFamily: 'sans-serif',
-    boxSizing: 'border-box',
-  };
-
-  const editButtonsContainerStyle = {
-    display: 'flex',
-    gap: '0.4rem',
-    alignSelf: 'flex-end',
-    marginTop: '0.4rem',
-  };
-
-  const editActionButtonStyle = {
-    padding: '0.3rem 0.6rem',
-    borderRadius: '4px',
-    border: 'none',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-  };
-
-  const moveButtonStyle = {
-    backgroundColor: '#e6f4ff',
-    color: '#0052cc',
-    border: 'none',
-    borderRadius: '4px',
-    padding: '0.4rem 0.8rem',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-  };
-
-  const deleteButtonStyle = {
-    backgroundColor: '#ffebe6',
-    color: '#de350b',
-    border: 'none',
-    borderRadius: '4px',
-    padding: '0.4rem 0.8rem',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    cursor: 'pointer',
+    cursor: isEditing ? 'default' : 'grab',
+    transition: transform ? undefined : 'transform 0.15s ease',
   };
 
   return (
-    // Bind setNodeRef to track bounds, and pass listeners and attributes to start dragging
     <div 
       ref={setNodeRef} 
-      style={cardStyle} 
+      style={dndStyle} 
+      className={`task-card prio-${task.priority} ${isDragging ? 'is-dragging' : ''}`}
       {...listeners} 
       {...attributes}
     >
       {isEditing ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+        <div className="edit-container">
           <input 
             type="text"
             value={draftTitle}
             onChange={(e) => setDraftTitle(e.target.value)}
             onKeyDown={handleKeyDown}
-            style={editInputStyle}
+            className="edit-input"
             autoFocus
           />
-          <div style={editButtonsContainerStyle}>
+          <div className="edit-actions">
             <button 
-              style={{ ...editActionButtonStyle, backgroundColor: '#0052cc', color: '#fff' }}
+              className="btn btn-sm btn-primary"
               onClick={handleSave}
             >
               Save
             </button>
             <button 
-              style={{ ...editActionButtonStyle, backgroundColor: '#f4f5f7', color: '#42526e' }}
+              className="btn btn-sm btn-secondary"
               onClick={handleCancelClick}
             >
               Cancel
@@ -188,7 +87,6 @@ function TaskCard({
         </div>
       ) : (
         <h4 
-          style={titleStyle} 
           onClick={() => onStartEdit(task.id)}
           title="Click to edit task name"
         >
@@ -196,13 +94,13 @@ function TaskCard({
         </h4>
       )}
 
-      {task.description && <p style={descriptionStyle}>{task.description}</p>}
+      {task.description && <p>{task.description}</p>}
       
       {!isEditing && (
-        <div style={actionsContainerStyle}>
+        <div className="task-actions">
           {task.status === 'todo' && (
             <button 
-              style={moveButtonStyle} 
+              className="btn btn-sm btn-secondary"
               onClick={() => onMoveTask(task.id, 'in-progress')}
             >
               Start →
@@ -211,7 +109,7 @@ function TaskCard({
           
           {task.status === 'in-progress' && (
             <button 
-              style={moveButtonStyle} 
+              className="btn btn-sm btn-secondary"
               onClick={() => onMoveTask(task.id, 'done')}
             >
               Complete →
@@ -220,7 +118,7 @@ function TaskCard({
           
           {task.status === 'done' && (
             <button 
-              style={{ ...moveButtonStyle, backgroundColor: '#f4f5f7', color: '#42526e' }} 
+              className="btn btn-sm btn-secondary"
               onClick={() => onMoveTask(task.id, 'in-progress')}
             >
               ← Reopen
@@ -228,7 +126,7 @@ function TaskCard({
           )}
 
           <button 
-            style={deleteButtonStyle} 
+            className="btn btn-sm btn-danger"
             onClick={() => onDeleteTask(task.id)}
           >
             Delete
