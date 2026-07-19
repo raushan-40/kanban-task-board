@@ -1,25 +1,25 @@
 import { useState } from 'react';
 
 function TaskForm({ onAddTask }) {
-  // Local states to handle controlled inputs
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  // Local state initialized to medium priority
+  const [priority, setPriority] = useState('medium');
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Ignore empty or whitespace-only titles
     if (!title.trim()) return;
 
-    // Send the structured input values to the parent handler
     onAddTask({
       title: title.trim(),
       description: description.trim(),
+      priority, // Pass priority up to the parent
     });
 
-    // Reset local form state
     setTitle('');
     setDescription('');
+    setPriority('medium'); // Reset dropdown back to default medium
   };
 
   const formStyle = {
@@ -40,6 +40,12 @@ function TaskForm({ onAddTask }) {
     border: '1px solid #dfe1e6',
     fontSize: '0.9rem',
     fontFamily: 'sans-serif',
+  };
+
+  const selectStyle = {
+    ...inputStyle,
+    cursor: 'pointer',
+    backgroundColor: '#fafbfc',
   };
 
   const buttonStyle = {
@@ -71,6 +77,21 @@ function TaskForm({ onAddTask }) {
         onChange={(e) => setDescription(e.target.value)}
         style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }}
       />
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+        <label style={{ fontSize: '0.8rem', color: '#5e6c84', fontWeight: '600' }}>
+          Select Priority Level:
+        </label>
+        <select 
+          value={priority} 
+          onChange={(e) => setPriority(e.target.value)} 
+          style={selectStyle}
+        >
+          <option value="low">Low Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+      </div>
       
       <button type="submit" style={buttonStyle}>
         Add Task

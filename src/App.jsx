@@ -9,36 +9,39 @@ function App() {
       title: 'Analyze Requirements',
       description: 'Review internship guidelines and functional scope.',
       status: 'todo',
+      priority: 'high', // Added priority property
     },
     {
       id: 'task-2',
       title: 'Design Layout',
       description: 'Implement structural flexbox grids for columns.',
       status: 'in-progress',
+      priority: 'medium', // Added priority property
     },
     {
       id: 'task-3',
       title: 'Set Up Repository',
       description: 'Initialize Vite app with essential component files.',
       status: 'done',
+      priority: 'low', // Added priority property
     },
   ]);
 
-  // Tracks which task is currently being edited. Only one can be edited at a time.
   const [editingTaskId, setEditingTaskId] = useState(null);
 
-  const handleAddTask = ({ title, description }) => {
+  // Added priority to destructuring
+  const handleAddTask = ({ title, description, priority }) => {
     const newTask = {
       id: crypto.randomUUID(),
       title,
       description,
+      priority, // Store priority directly on the task object
       status: 'todo',
     };
     setTasks([...tasks, newTask]);
   };
 
   const handleDeleteTask = (taskId) => {
-    // If we delete the task currently being edited, reset the editing state
     if (editingTaskId === taskId) {
       setEditingTaskId(null);
     }
@@ -55,7 +58,6 @@ function App() {
     setTasks(updatedTasks);
   };
 
-  // Inline editing handlers
   const handleStartEdit = (taskId) => {
     setEditingTaskId(taskId);
   };
@@ -65,7 +67,7 @@ function App() {
   };
 
   const handleSaveTask = (taskId, newTitle) => {
-    if (!newTitle.trim()) return; // Disallow empty titles
+    if (!newTitle.trim()) return;
 
     const updatedTasks = tasks.map((task) => {
       if (task.id === taskId) {
@@ -75,7 +77,7 @@ function App() {
     });
 
     setTasks(updatedTasks);
-    setEditingTaskId(null); // Turn off edit mode upon successful save
+    setEditingTaskId(null);
   };
 
   const containerStyle = {

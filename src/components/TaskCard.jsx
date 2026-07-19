@@ -9,7 +9,6 @@ function TaskCard({
   onCancelEdit, 
   onSaveTask 
 }) {
-  // Local state to store typing draft before saving
   const [draftTitle, setDraftTitle] = useState(task.title);
 
   const handleSave = () => {
@@ -21,7 +20,6 @@ function TaskCard({
     if (e.key === 'Enter') {
       handleSave();
     } else if (e.key === 'Escape') {
-      // Discard typing draft and cancel edit mode
       setDraftTitle(task.title);
       onCancelEdit();
     }
@@ -30,6 +28,20 @@ function TaskCard({
   const handleCancelClick = () => {
     setDraftTitle(task.title);
     onCancelEdit();
+  };
+
+  // Helper utility function to match priority values to theme border colors
+  const getPriorityBorderColor = (priority) => {
+    switch (priority) {
+      case 'high':
+        return '#de350b'; // Red
+      case 'medium':
+        return '#ffab00'; // Yellow/Amber
+      case 'low':
+        return '#36b37e'; // Green
+      default:
+        return '#dfe1e6';
+    }
   };
 
   const cardStyle = {
@@ -41,6 +53,8 @@ function TaskCard({
     display: 'flex',
     flexDirection: 'column',
     gap: '0.5rem',
+    // Apply a prominent, professional left accent border using calculated color
+    borderLeft: `5px solid ${getPriorityBorderColor(task.priority)}`,
   };
 
   const titleStyle = {
@@ -119,7 +133,6 @@ function TaskCard({
   return (
     <div style={cardStyle}>
       {isEditing ? (
-        // EDIT MODE UI
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <input 
             type="text"
@@ -145,7 +158,6 @@ function TaskCard({
           </div>
         </div>
       ) : (
-        // VIEW MODE UI
         <h4 
           style={titleStyle} 
           onClick={() => onStartEdit(task.id)}
@@ -157,7 +169,6 @@ function TaskCard({
 
       {task.description && <p style={descriptionStyle}>{task.description}</p>}
       
-      {/* Hide column transition controls while editing is in progress to prevent partial updates */}
       {!isEditing && (
         <div style={actionsContainerStyle}>
           {task.status === 'todo' && (
