@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Board from './components/Board';
+import TaskForm from './components/TaskForm';
 
 function App() {
-  // Master state containing 3 initial sample tasks (one for each status)
   const [tasks, setTasks] = useState([
     {
       id: 'task-1',
@@ -24,6 +24,18 @@ function App() {
     },
   ]);
 
+  // Handler to receive new task inputs and update top-level state
+  const handleAddTask = ({ title, description }) => {
+    const newTask = {
+      id: crypto.randomUUID(), // Generates a standard cryptographically strong unique ID
+      title,
+      description,
+      status: 'todo', // Always direct new tasks to the beginning column
+    };
+
+    setTasks([...tasks, newTask]);
+  };
+
   const containerStyle = {
     fontFamily: 'sans-serif',
     backgroundColor: '#fafbfc',
@@ -42,8 +54,10 @@ function App() {
       <header style={headerStyle}>
         <h1>Kanban Board</h1>
       </header>
+      
       <main>
-        {/* Passing the entire tasks state down to Board */}
+        {/* Rendering the form and passing the handler callback */}
+        <TaskForm onAddTask={handleAddTask} />
         <Board tasks={tasks} />
       </main>
     </div>
