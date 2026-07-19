@@ -42,7 +42,7 @@ function TaskCard({
     onCancelEdit();
   };
 
-  // We isolate dnd-kit dynamic layout parameters inside this inline object 
+  // Only dynamic dnd-kit properties remain inline
   const dndStyle = {
     transform: transform 
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)` 
@@ -52,6 +52,7 @@ function TaskCard({
     transition: transform ? undefined : 'transform 0.15s ease',
   };
 
+  // Removed all unused style object constants from the bottom of this file
   return (
     <div 
       ref={setNodeRef} 

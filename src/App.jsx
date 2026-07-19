@@ -2,6 +2,31 @@ import { useState, useEffect } from 'react';
 import Board from './components/Board';
 import TaskForm from './components/TaskForm';
 
+// Extracted static configurations out of component scope to save memory allocations
+const INITIAL_TASKS = [
+  {
+    id: 'task-1',
+    title: 'Analyze Requirements',
+    description: 'Review internship guidelines and functional scope.',
+    status: 'todo',
+    priority: 'high',
+  },
+  {
+    id: 'task-2',
+    title: 'Design Layout',
+    description: 'Implement structural flexbox grids for columns.',
+    status: 'in-progress',
+    priority: 'medium',
+  },
+  {
+    id: 'task-3',
+    title: 'Set Up Repository',
+    description: 'Initialize Vite app with essential component files.',
+    status: 'done',
+    priority: 'low',
+  },
+];
+
 function App() {
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem('kanban-tasks');
@@ -13,30 +38,7 @@ function App() {
         console.error("Failed to parse tasks from localStorage:", error);
       }
     }
-
-    return [
-      {
-        id: 'task-1',
-        title: 'Analyze Requirements',
-        description: 'Review internship guidelines and functional scope.',
-        status: 'todo',
-        priority: 'high',
-      },
-      {
-        id: 'task-2',
-        title: 'Design Layout',
-        description: 'Implement structural flexbox grids for columns.',
-        status: 'in-progress',
-        priority: 'medium',
-      },
-      {
-        id: 'task-3',
-        title: 'Set Up Repository',
-        description: 'Initialize Vite app with essential component files.',
-        status: 'done',
-        priority: 'low',
-      },
-    ];
+    return INITIAL_TASKS;
   });
 
   const [editingTaskId, setEditingTaskId] = useState(null);
@@ -46,32 +48,33 @@ function App() {
     localStorage.setItem('kanban-tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  // Switched all state setters to safe functional updates (prevTasks)
   const handleAddTask = ({ title, description, priority }) => {
-    const newTask = {
-      id: crypto.randomUUID(),
-      title,
-      description,
-      priority,
-      status: 'todo',
-    };
-    setTasks([...tasks, newTask]);
+    setTasks((prevTasks) => [
+      ...prevTasks,
+      {
+        id: crypto.randomUUID(),
+        title,
+        description,
+        priority,
+        status: 'todo',
+      },
+    ]);
   };
 
   const handleDeleteTask = (taskId) => {
     if (editingTaskId === taskId) {
       setEditingTaskId(null);
     }
-    setTasks(tasks.filter((task) => task.id !== taskId));
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
 
   const handleMoveTask = (taskId, newStatus) => {
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        return { ...task, status: newStatus };
-      }
-      return task;
-    });
-    setTasks(updatedTasks);
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+      )
+    );
   };
 
   const handleStartEdit = (taskId) => {
@@ -83,29 +86,28 @@ function App() {
   };
 
   const handleSaveTask = (taskId, newTitle) => {
-    if (!newTitle.trim()) return;
+    const trimmedTitle = newTitle.trim();
+    if (!trimmedTitle) return;
 
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        return { ...task, title: newTitle.trim() };
-      }
-      return task;
-    });
-
-    setTasks(updatedTasks);
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, title: trimmedTitle } : task
+      )
+    );
     setEditingTaskId(null);
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    const normalizedQuery = searchQuery.toLowerCase().trim();
-    const matchesTitle = task.title.toLowerCase().includes(normalizedQuery);
-    const matchesDescription = task.description.toLowerCase().includes(normalizedQuery);
-    
-    return matchesTitle || matchesDescription;
-  });
+  // Performance Optimization: If search input is blank, skip complex mapping
+  const normalizedQuery = searchQuery.toLowerCase().trim();
+  const filteredTasks = !normalizedQuery
+    ? tasks
+    : tasks.filter((task) => {
+        const matchesTitle = task.title.toLowerCase().includes(normalizedQuery);
+        const matchesDescription = task.description.toLowerCase().includes(normalizedQuery);
+        return matchesTitle || matchesDescription;
+      });
 
   return (
-    // Replaced inline styling wrappers with custom semantic CSS classes
     <div className="app-container">
       <header className="app-header">
         <h1>Kanban Board</h1>

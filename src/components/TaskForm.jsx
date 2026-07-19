@@ -21,8 +21,8 @@ function TaskForm({ onAddTask }) {
     setPriority('medium');
   };
 
+  // Removed all unused style object constants from the bottom of this file
   return (
-    // Replaced inline styling blocks with clean layout-specific classes
     <form onSubmit={handleSubmit} className="form-card">
       <h3>Create a New Task</h3>
       
@@ -46,7 +46,7 @@ function TaskForm({ onAddTask }) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="form-input"
-          style={{ minHeight: '60px', resize: 'vertical' }} // Kept native box height inline
+          style={{ minHeight: '60px', resize: 'vertical' }}
         />
       </div>
 
