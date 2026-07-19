@@ -1,4 +1,6 @@
 import { useState } from 'react';
+// Imported useDraggable hook
+import { useDraggable } from '@dnd-kit/core';
 
 function TaskCard({ 
   task, 
@@ -10,6 +12,19 @@ function TaskCard({
   onSaveTask 
 }) {
   const [draftTitle, setDraftTitle] = useState(task.title);
+
+  // 1. Initialize TaskCard as a draggable component mapping its ID to task.id
+  // Disable drag listeners if inline editing is active to avoid conflict while selecting text
+  const { 
+    attributes, 
+    listeners, 
+    setNodeRef, 
+    transform,
+    isDragging 
+  } = useDraggable({
+    id: task.id,
+    disabled: isEditing,
+  });
 
   const handleSave = () => {
     if (!draftTitle.trim()) return;
@@ -30,15 +45,14 @@ function TaskCard({
     onCancelEdit();
   };
 
-  // Helper utility function to match priority values to theme border colors
   const getPriorityBorderColor = (priority) => {
     switch (priority) {
       case 'high':
-        return '#de350b'; // Red
+        return '#de350b';
       case 'medium':
-        return '#ffab00'; // Yellow/Amber
+        return '#ffab00';
       case 'low':
-        return '#36b37e'; // Green
+        return '#36b37e';
       default:
         return '#dfe1e6';
     }
@@ -53,8 +67,17 @@ function TaskCard({
     display: 'flex',
     flexDirection: 'column',
     gap: '0.5rem',
-    // Apply a prominent, professional left accent border using calculated color
     borderLeft: `5px solid ${getPriorityBorderColor(task.priority)}`,
+    cursor: isEditing ? 'default' : 'grab',
+    touchAction: 'none', // Prevents default touch scroll behavior while dragging on mobile devices
+    
+    // 2. Map position offset dynamically when the card is active
+    transform: transform 
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)` 
+      : undefined,
+    zIndex: isDragging ? 999 : undefined,
+    opacity: isDragging ? 0.7 : undefined,
+    transition: transform ? undefined : 'transform 0.1s ease', // Smooth snap-back transition
   };
 
   const titleStyle = {
@@ -131,7 +154,13 @@ function TaskCard({
   };
 
   return (
-    <div style={cardStyle}>
+    // Bind setNodeRef to track bounds, and pass listeners and attributes to start dragging
+    <div 
+      ref={setNodeRef} 
+      style={cardStyle} 
+      {...listeners} 
+      {...attributes}
+    >
       {isEditing ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <input 
