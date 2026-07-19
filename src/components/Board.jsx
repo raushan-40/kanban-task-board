@@ -1,6 +1,6 @@
 import Column from './Column';
 
-function Board({ tasks, onDeleteTask }) {
+function Board({ tasks, onDeleteTask, onMoveTask }) {
   const boardStyle = {
     display: 'flex',
     gap: '1.5rem',
@@ -15,10 +15,25 @@ function Board({ tasks, onDeleteTask }) {
 
   return (
     <div style={boardStyle}>
-      {/* Passing onDeleteTask down to each Column */}
-      <Column title="To Do" tasks={todoTasks} onDeleteTask={onDeleteTask} />
-      <Column title="In Progress" tasks={inProgressTasks} onDeleteTask={onDeleteTask} />
-      <Column title="Done" tasks={doneTasks} onDeleteTask={onDeleteTask} />
+      {/* Propagating onMoveTask downwards */}
+      <Column 
+        title="To Do" 
+        tasks={todoTasks} 
+        onDeleteTask={onDeleteTask} 
+        onMoveTask={onMoveTask} 
+      />
+      <Column 
+        title="In Progress" 
+        tasks={inProgressTasks} 
+        onDeleteTask={onDeleteTask} 
+        onMoveTask={onMoveTask} 
+      />
+      <Column 
+        title="Done" 
+        tasks={doneTasks} 
+        onDeleteTask={onDeleteTask} 
+        onMoveTask={onMoveTask} 
+      />
     </div>
   );
 }

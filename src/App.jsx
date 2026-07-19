@@ -34,9 +34,21 @@ function App() {
     setTasks([...tasks, newTask]);
   };
 
-  // Immutable state update deleting the targeted task using filter
   const handleDeleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
+
+  // Pure state update function to handle transitions between columns
+  const handleMoveTask = (taskId, newStatus) => {
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        // Return a brand new object with the updated status
+        return { ...task, status: newStatus };
+      }
+      // Return unchanged reference for all other tasks
+      return task;
+    });
+
     setTasks(updatedTasks);
   };
 
@@ -61,8 +73,12 @@ function App() {
       
       <main>
         <TaskForm onAddTask={handleAddTask} />
-        {/* Passing the delete callback down to Board */}
-        <Board tasks={tasks} onDeleteTask={handleDeleteTask} />
+        {/* Passing move callback down to the Board wrapper */}
+        <Board 
+          tasks={tasks} 
+          onDeleteTask={handleDeleteTask} 
+          onMoveTask={handleMoveTask} 
+        />
       </main>
     </div>
   );

@@ -1,4 +1,4 @@
-function TaskCard({ task, onDeleteTask }) {
+function TaskCard({ task, onDeleteTask, onMoveTask }) {
   const cardStyle = {
     backgroundColor: '#ffffff',
     borderRadius: '6px',
@@ -24,8 +24,27 @@ function TaskCard({ task, onDeleteTask }) {
     lineHeight: '1.4',
   };
 
-  const buttonStyle = {
-    alignSelf: 'flex-end',
+  const actionsContainerStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '0.5rem',
+    gap: '0.5rem',
+  };
+
+  const moveButtonStyle = {
+    backgroundColor: '#e6f4ff',
+    color: '#0052cc',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '0.4rem 0.8rem',
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease',
+  };
+
+  const deleteButtonStyle = {
     backgroundColor: '#ffebe6',
     color: '#de350b',
     border: 'none',
@@ -42,13 +61,42 @@ function TaskCard({ task, onDeleteTask }) {
       <h4 style={titleStyle}>{task.title}</h4>
       {task.description && <p style={descriptionStyle}>{task.description}</p>}
       
-      {/* Clicking trigger starts bubbling of task id */}
-      <button 
-        style={buttonStyle} 
-        onClick={() => onDeleteTask(task.id)}
-      >
-        Delete
-      </button>
+      <div style={actionsContainerStyle}>
+        {/* Conditional rendering based on task status */}
+        {task.status === 'todo' && (
+          <button 
+            style={moveButtonStyle} 
+            onClick={() => onMoveTask(task.id, 'in-progress')}
+          >
+            Start →
+          </button>
+        )}
+        
+        {task.status === 'in-progress' && (
+          <button 
+            style={moveButtonStyle} 
+            onClick={() => onMoveTask(task.id, 'done')}
+          >
+            Complete →
+          </button>
+        )}
+        
+        {task.status === 'done' && (
+          <button 
+            style={{ ...moveButtonStyle, backgroundColor: '#f4f5f7', color: '#42526e' }} 
+            onClick={() => onMoveTask(task.id, 'in-progress')}
+          >
+            ← Reopen
+          </button>
+        )}
+
+        <button 
+          style={deleteButtonStyle} 
+          onClick={() => onDeleteTask(task.id)}
+        >
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
