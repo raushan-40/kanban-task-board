@@ -24,16 +24,20 @@ function App() {
     },
   ]);
 
-  // Handler to receive new task inputs and update top-level state
   const handleAddTask = ({ title, description }) => {
     const newTask = {
-      id: crypto.randomUUID(), // Generates a standard cryptographically strong unique ID
+      id: crypto.randomUUID(),
       title,
       description,
-      status: 'todo', // Always direct new tasks to the beginning column
+      status: 'todo',
     };
-
     setTasks([...tasks, newTask]);
+  };
+
+  // Immutable state update deleting the targeted task using filter
+  const handleDeleteTask = (taskId) => {
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
   };
 
   const containerStyle = {
@@ -56,9 +60,9 @@ function App() {
       </header>
       
       <main>
-        {/* Rendering the form and passing the handler callback */}
         <TaskForm onAddTask={handleAddTask} />
-        <Board tasks={tasks} />
+        {/* Passing the delete callback down to Board */}
+        <Board tasks={tasks} onDeleteTask={handleDeleteTask} />
       </main>
     </div>
   );
