@@ -1,5 +1,6 @@
-function Column({ title }) {
-  // Simple inline styles to structure columns visually
+import TaskCard from './TaskCard';
+
+function Column({ title, tasks }) {
   const columnStyle = {
     flex: 1,
     backgroundColor: '#ebecf0',
@@ -11,9 +12,16 @@ function Column({ title }) {
     flexDirection: 'column',
   };
 
-  const placeholderStyle = {
-    flexGrow: 1,
+  const listContainerStyle = {
     marginTop: '1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    flexGrow: 1,
+  };
+
+  const emptyPlaceholderStyle = {
+    flexGrow: 1,
     border: '2px dashed #b0b0b0',
     borderRadius: '4px',
     display: 'flex',
@@ -21,13 +29,23 @@ function Column({ title }) {
     justifyContent: 'center',
     color: '#7a869a',
     fontSize: '0.9rem',
+    minHeight: '100px',
   };
 
   return (
     <section style={columnStyle}>
-      <h3 style={{ color: '#172b4d', margin: 0 }}>{title}</h3>
-      <div style={placeholderStyle}>
-        No tasks yet
+      <h3 style={{ color: '#172b4d', margin: 0 }}>
+        {title} ({tasks.length})
+      </h3>
+
+      <div style={listContainerStyle}>
+        {tasks.length === 0 ? (
+          <div style={emptyPlaceholderStyle}>No tasks yet</div>
+        ) : (
+          tasks.map((task) => (
+            <TaskCard key={task.id} task={task} />
+          ))
+        )}
       </div>
     </section>
   );
