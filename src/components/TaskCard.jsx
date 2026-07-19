@@ -1,4 +1,37 @@
-function TaskCard({ task, onDeleteTask, onMoveTask }) {
+import { useState } from 'react';
+
+function TaskCard({ 
+  task, 
+  onDeleteTask, 
+  onMoveTask, 
+  isEditing, 
+  onStartEdit, 
+  onCancelEdit, 
+  onSaveTask 
+}) {
+  // Local state to store typing draft before saving
+  const [draftTitle, setDraftTitle] = useState(task.title);
+
+  const handleSave = () => {
+    if (!draftTitle.trim()) return;
+    onSaveTask(task.id, draftTitle);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      // Discard typing draft and cancel edit mode
+      setDraftTitle(task.title);
+      onCancelEdit();
+    }
+  };
+
+  const handleCancelClick = () => {
+    setDraftTitle(task.title);
+    onCancelEdit();
+  };
+
   const cardStyle = {
     backgroundColor: '#ffffff',
     borderRadius: '6px',
@@ -15,6 +48,8 @@ function TaskCard({ task, onDeleteTask, onMoveTask }) {
     color: '#172b4d',
     fontSize: '1rem',
     fontWeight: '600',
+    cursor: 'pointer',
+    padding: '0.2rem 0',
   };
 
   const descriptionStyle = {
@@ -32,6 +67,33 @@ function TaskCard({ task, onDeleteTask, onMoveTask }) {
     gap: '0.5rem',
   };
 
+  const editInputStyle = {
+    width: '100%',
+    padding: '0.4rem',
+    borderRadius: '4px',
+    border: '2px solid #4c9aff',
+    fontSize: '1rem',
+    fontWeight: '600',
+    fontFamily: 'sans-serif',
+    boxSizing: 'border-box',
+  };
+
+  const editButtonsContainerStyle = {
+    display: 'flex',
+    gap: '0.4rem',
+    alignSelf: 'flex-end',
+    marginTop: '0.4rem',
+  };
+
+  const editActionButtonStyle = {
+    padding: '0.3rem 0.6rem',
+    borderRadius: '4px',
+    border: 'none',
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+  };
+
   const moveButtonStyle = {
     backgroundColor: '#e6f4ff',
     color: '#0052cc',
@@ -41,7 +103,6 @@ function TaskCard({ task, onDeleteTask, onMoveTask }) {
     fontSize: '0.75rem',
     fontWeight: '600',
     cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
   };
 
   const deleteButtonStyle = {
@@ -53,50 +114,87 @@ function TaskCard({ task, onDeleteTask, onMoveTask }) {
     fontSize: '0.75rem',
     fontWeight: '600',
     cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
   };
 
   return (
     <div style={cardStyle}>
-      <h4 style={titleStyle}>{task.title}</h4>
+      {isEditing ? (
+        // EDIT MODE UI
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+          <input 
+            type="text"
+            value={draftTitle}
+            onChange={(e) => setDraftTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            style={editInputStyle}
+            autoFocus
+          />
+          <div style={editButtonsContainerStyle}>
+            <button 
+              style={{ ...editActionButtonStyle, backgroundColor: '#0052cc', color: '#fff' }}
+              onClick={handleSave}
+            >
+              Save
+            </button>
+            <button 
+              style={{ ...editActionButtonStyle, backgroundColor: '#f4f5f7', color: '#42526e' }}
+              onClick={handleCancelClick}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        // VIEW MODE UI
+        <h4 
+          style={titleStyle} 
+          onClick={() => onStartEdit(task.id)}
+          title="Click to edit task name"
+        >
+          {task.title}
+        </h4>
+      )}
+
       {task.description && <p style={descriptionStyle}>{task.description}</p>}
       
-      <div style={actionsContainerStyle}>
-        {/* Conditional rendering based on task status */}
-        {task.status === 'todo' && (
-          <button 
-            style={moveButtonStyle} 
-            onClick={() => onMoveTask(task.id, 'in-progress')}
-          >
-            Start →
-          </button>
-        )}
-        
-        {task.status === 'in-progress' && (
-          <button 
-            style={moveButtonStyle} 
-            onClick={() => onMoveTask(task.id, 'done')}
-          >
-            Complete →
-          </button>
-        )}
-        
-        {task.status === 'done' && (
-          <button 
-            style={{ ...moveButtonStyle, backgroundColor: '#f4f5f7', color: '#42526e' }} 
-            onClick={() => onMoveTask(task.id, 'in-progress')}
-          >
-            ← Reopen
-          </button>
-        )}
+      {/* Hide column transition controls while editing is in progress to prevent partial updates */}
+      {!isEditing && (
+        <div style={actionsContainerStyle}>
+          {task.status === 'todo' && (
+            <button 
+              style={moveButtonStyle} 
+              onClick={() => onMoveTask(task.id, 'in-progress')}
+            >
+              Start →
+            </button>
+          )}
+          
+          {task.status === 'in-progress' && (
+            <button 
+              style={moveButtonStyle} 
+              onClick={() => onMoveTask(task.id, 'done')}
+            >
+              Complete →
+            </button>
+          )}
+          
+          {task.status === 'done' && (
+            <button 
+              style={{ ...moveButtonStyle, backgroundColor: '#f4f5f7', color: '#42526e' }} 
+              onClick={() => onMoveTask(task.id, 'in-progress')}
+            >
+              ← Reopen
+            </button>
+          )}
 
-        <button 
-          style={deleteButtonStyle} 
-          onClick={() => onDeleteTask(task.id)}
-        >
-          Delete
-        </button>
-      </div>
+          <button 
+            style={deleteButtonStyle} 
+            onClick={() => onDeleteTask(task.id)}
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }

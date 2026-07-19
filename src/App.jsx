@@ -24,6 +24,9 @@ function App() {
     },
   ]);
 
+  // Tracks which task is currently being edited. Only one can be edited at a time.
+  const [editingTaskId, setEditingTaskId] = useState(null);
+
   const handleAddTask = ({ title, description }) => {
     const newTask = {
       id: crypto.randomUUID(),
@@ -35,21 +38,44 @@ function App() {
   };
 
   const handleDeleteTask = (taskId) => {
+    // If we delete the task currently being edited, reset the editing state
+    if (editingTaskId === taskId) {
+      setEditingTaskId(null);
+    }
     setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
-  // Pure state update function to handle transitions between columns
   const handleMoveTask = (taskId, newStatus) => {
     const updatedTasks = tasks.map((task) => {
       if (task.id === taskId) {
-        // Return a brand new object with the updated status
         return { ...task, status: newStatus };
       }
-      // Return unchanged reference for all other tasks
+      return task;
+    });
+    setTasks(updatedTasks);
+  };
+
+  // Inline editing handlers
+  const handleStartEdit = (taskId) => {
+    setEditingTaskId(taskId);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTaskId(null);
+  };
+
+  const handleSaveTask = (taskId, newTitle) => {
+    if (!newTitle.trim()) return; // Disallow empty titles
+
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        return { ...task, title: newTitle.trim() };
+      }
       return task;
     });
 
     setTasks(updatedTasks);
+    setEditingTaskId(null); // Turn off edit mode upon successful save
   };
 
   const containerStyle = {
@@ -73,11 +99,14 @@ function App() {
       
       <main>
         <TaskForm onAddTask={handleAddTask} />
-        {/* Passing move callback down to the Board wrapper */}
         <Board 
           tasks={tasks} 
           onDeleteTask={handleDeleteTask} 
           onMoveTask={handleMoveTask} 
+          editingTaskId={editingTaskId}
+          onStartEdit={handleStartEdit}
+          onCancelEdit={handleCancelEdit}
+          onSaveTask={handleSaveTask}
         />
       </main>
     </div>

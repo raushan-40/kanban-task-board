@@ -1,6 +1,14 @@
 import Column from './Column';
 
-function Board({ tasks, onDeleteTask, onMoveTask }) {
+function Board({ 
+  tasks, 
+  onDeleteTask, 
+  onMoveTask, 
+  editingTaskId, 
+  onStartEdit, 
+  onCancelEdit, 
+  onSaveTask 
+}) {
   const boardStyle = {
     display: 'flex',
     gap: '1.5rem',
@@ -15,24 +23,35 @@ function Board({ tasks, onDeleteTask, onMoveTask }) {
 
   return (
     <div style={boardStyle}>
-      {/* Propagating onMoveTask downwards */}
       <Column 
         title="To Do" 
         tasks={todoTasks} 
         onDeleteTask={onDeleteTask} 
         onMoveTask={onMoveTask} 
+        editingTaskId={editingTaskId}
+        onStartEdit={onStartEdit}
+        onCancelEdit={onCancelEdit}
+        onSaveTask={onSaveTask}
       />
       <Column 
         title="In Progress" 
         tasks={inProgressTasks} 
         onDeleteTask={onDeleteTask} 
         onMoveTask={onMoveTask} 
+        editingTaskId={editingTaskId}
+        onStartEdit={onStartEdit}
+        onCancelEdit={onCancelEdit}
+        onSaveTask={onSaveTask}
       />
       <Column 
         title="Done" 
         tasks={doneTasks} 
         onDeleteTask={onDeleteTask} 
         onMoveTask={onMoveTask} 
+        editingTaskId={editingTaskId}
+        onStartEdit={onStartEdit}
+        onCancelEdit={onCancelEdit}
+        onSaveTask={onSaveTask}
       />
     </div>
   );

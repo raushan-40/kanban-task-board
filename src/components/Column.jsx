@@ -1,6 +1,15 @@
 import TaskCard from './TaskCard';
 
-function Column({ title, tasks, onDeleteTask, onMoveTask }) {
+function Column({ 
+  title, 
+  tasks, 
+  onDeleteTask, 
+  onMoveTask, 
+  editingTaskId, 
+  onStartEdit, 
+  onCancelEdit, 
+  onSaveTask 
+}) {
   const columnStyle = {
     flex: 1,
     backgroundColor: '#ebecf0',
@@ -43,12 +52,15 @@ function Column({ title, tasks, onDeleteTask, onMoveTask }) {
           <div style={emptyPlaceholderStyle}>No tasks yet</div>
         ) : (
           tasks.map((task) => (
-            // Propagating onMoveTask to individual TaskCards
             <TaskCard 
               key={task.id} 
               task={task} 
               onDeleteTask={onDeleteTask} 
               onMoveTask={onMoveTask} 
+              isEditing={editingTaskId === task.id}
+              onStartEdit={onStartEdit}
+              onCancelEdit={onCancelEdit}
+              onSaveTask={onSaveTask}
             />
           ))
         )}
