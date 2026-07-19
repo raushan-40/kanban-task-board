@@ -1,41 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Imported useEffect
 import Board from './components/Board';
 import TaskForm from './components/TaskForm';
 
 function App() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 'task-1',
-      title: 'Analyze Requirements',
-      description: 'Review internship guidelines and functional scope.',
-      status: 'todo',
-      priority: 'high', // Added priority property
-    },
-    {
-      id: 'task-2',
-      title: 'Design Layout',
-      description: 'Implement structural flexbox grids for columns.',
-      status: 'in-progress',
-      priority: 'medium', // Added priority property
-    },
-    {
-      id: 'task-3',
-      title: 'Set Up Repository',
-      description: 'Initialize Vite app with essential component files.',
-      status: 'done',
-      priority: 'low', // Added priority property
-    },
-  ]);
+  // 1. Lazy State Initialization to fetch data synchronously on startup
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem('kanban-tasks');
+    
+    if (savedTasks) {
+      try {
+        return JSON.parse(savedTasks);
+      } catch (error) {
+        console.error("Failed to parse tasks from localStorage:", error);
+        // Fallback to sample tasks if parsing fails
+      }
+    }
+
+    // Default static fallback tasks if empty
+    return [
+      {
+        id: 'task-1',
+        title: 'Analyze Requirements',
+        description: 'Review internship guidelines and functional scope.',
+        status: 'todo',
+        priority: 'high',
+      },
+      {
+        id: 'task-2',
+        title: 'Design Layout',
+        description: 'Implement structural flexbox grids for columns.',
+        status: 'in-progress',
+        priority: 'medium',
+      },
+      {
+        id: 'task-3',
+        title: 'Set Up Repository',
+        description: 'Initialize Vite app with essential component files.',
+        status: 'done',
+        priority: 'low',
+      },
+    ];
+  });
 
   const [editingTaskId, setEditingTaskId] = useState(null);
 
-  // Added priority to destructuring
+  // 2. Sync Effect: Runs on mount and whenever the 'tasks' state reference changes
+  useEffect(() => {
+    localStorage.setItem('kanban-tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
   const handleAddTask = ({ title, description, priority }) => {
     const newTask = {
       id: crypto.randomUUID(),
       title,
       description,
-      priority, // Store priority directly on the task object
+      priority,
       status: 'todo',
     };
     setTasks([...tasks, newTask]);
